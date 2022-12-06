@@ -1,5 +1,10 @@
 import sys
 
+def find_first_distinct_marker(packet, characters):
+    for i in range(len(packet)):
+        if len(set(packet[i:i+characters])) == characters:
+            return i+characters
+
 def parse(file_name):
     """Parse input."""
     packets = []
@@ -14,10 +19,7 @@ def part1(data):
     """Solve part 1."""
     start_markers = []
     for packet in data:
-        for i in range(len(packet)):
-            if len(set(packet[i:i+4])) == 4:
-                start_markers.append(i+4)
-                break
+        start_markers.append(find_first_distinct_marker(packet,4))
 
     return start_markers
 
@@ -25,10 +27,7 @@ def part2(data):
     """Solve part 2."""
     message_markers = []
     for packet in data:
-        for i in range(len(packet)):
-            if len(set(packet[i:i+14])) == 14:
-                message_markers.append(i+14)
-                break
+        message_markers.append(find_first_distinct_marker(packet,14))
 
     return message_markers
 
