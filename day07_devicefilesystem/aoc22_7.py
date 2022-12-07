@@ -51,7 +51,7 @@ def parse(file_name):
                     current_location = f"{current_location}/{new_dir}"
                 # Going back up a level.
                 else:
-                    current_location = re.sub(r"\/[a-z\.]$","", current_location)
+                    current_location = re.sub(r"\/[a-z\.]+$","", current_location)
 
                 # Make sure the directory is in the file_system.
                 if new_dir != ".." and current_location not in file_system.keys():
