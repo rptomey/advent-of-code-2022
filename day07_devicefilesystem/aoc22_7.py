@@ -110,7 +110,17 @@ def part1(data):
 
 def part2(data):
     """Solve part 2."""
-    pass
+    max_size = 70000000
+    size_used = data["root"]["size"]
+    size_available = max_size - size_used
+    size_needed = 30000000 - size_available
+
+    big_directory_sizes = []
+    for key in data.keys():
+        if data[key]["type"] == "directory" and data[key]["size"] >= size_needed:
+            big_directory_sizes.append(data[key]["size"])
+
+    return sorted(big_directory_sizes)[0]
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
