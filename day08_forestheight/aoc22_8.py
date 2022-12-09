@@ -1,8 +1,4 @@
 import sys
-import re
-
-def mark_visible(forest, x, y):
-    pass
 
 def parse(file_name):
     """Parse input"""
