@@ -17,15 +17,16 @@ def compare(left, right):
     if type(right) != list:
         right = [right]
 
-    # Make sure we're not going to run out of items in right.
-    if len(left) > len(right):
-        return "unordered"
-
     # Check all of left against all of right.
     for i in range(len(left)):
+        if i >= len(right):
+            return "unordered"
         result = compare(left[i], right[i])
-        if result != "continue":
+        if result == "ordered" or result == "unordered":
             return result
+
+    # Fallback to ordered if we run out of stuff to test.
+    return "ordered"
 
 def parse(file_name):
     """Parse input"""
