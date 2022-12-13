@@ -5,11 +5,11 @@ def compare(left, right):
     #print(f"- Compare {left} vs {right}")
     if type(left) == int and type(right) == int:
         if left < right:
-            return 1
+            return "ordered"
         elif left > right:
-            return -1
+            return "unordered"
         else:
-            return 0
+            return "continue"
     
     # Make sure both sides are lists before we do anything else.
     if type(left) != list:
@@ -20,17 +20,17 @@ def compare(left, right):
     # Check all of left against all of right.
     for i in range(len(left)):
         if i >= len(right):
-            return -1
+            return "unordered"
         result = compare(left[i], right[i])
-        if result != 0:
+        if result != "continue":
             return result
 
     if len(left) < len(right):
-        return 1
+        return "ordered"
     elif len(left) > len(right):
-        return -1
+        return "unordered"
     else:
-        return 0
+        return "continue"
 
 def parse(file_name):
     """Parse input"""
@@ -66,7 +66,7 @@ def part1(data):
         right = pair["right"]
         result = compare(left, right)
     #    print(result)
-        if result == 1:
+        if result == "ordered":
             ordered_pairs += pair["index"]
 
     return ordered_pairs
@@ -82,7 +82,7 @@ def part2(data):
 
     for i in range(len(packets)):
         for j in range(i+1,len(packets)):
-            if compare(packets[i],packets[j]) == -1:
+            if compare(packets[i],packets[j]) == "unordered":
                 packets[i], packets[j] = packets[j], packets[i]
                 
     return (packets.index([[2]])+1) * (packets.index([[6]])+1)
