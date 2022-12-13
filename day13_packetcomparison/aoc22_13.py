@@ -2,14 +2,14 @@ import sys
 import json
 
 def compare(left, right):
-    print(f"- Compare {left} vs {right}")
+    #print(f"- Compare {left} vs {right}")
     if type(left) == int and type(right) == int:
         if left < right:
-            return "ordered"
+            return 1
         elif left > right:
-            return "unordered"
+            return -1
         else:
-            return "continue"
+            return 0
     
     # Make sure both sides are lists before we do anything else.
     if type(left) != list:
@@ -20,17 +20,17 @@ def compare(left, right):
     # Check all of left against all of right.
     for i in range(len(left)):
         if i >= len(right):
-            return "unordered"
+            return -1
         result = compare(left[i], right[i])
-        if result != "continue":
+        if result != 0:
             return result
 
     if len(left) < len(right):
-        return "ordered"
+        return 1
     elif len(left) > len(right):
-        return "unordered"
+        return -1
     else:
-        return "continue"
+        return 0
 
 def parse(file_name):
     """Parse input"""
@@ -61,19 +61,31 @@ def part1(data):
     """Solve part 1."""
     ordered_pairs = 0
     for pair in data:
-        print(f"== Pair {pair['index']} ==")
+    #    print(f"== Pair {pair['index']} ==")
         left = pair["left"]
         right = pair["right"]
         result = compare(left, right)
-        print(result)
-        if result == "ordered":
+    #    print(result)
+        if result == 1:
             ordered_pairs += pair["index"]
 
     return ordered_pairs
 
 def part2(data):
     """Solve part 2."""
-    pass
+    packets = []
+    for pair in data:
+        packets.append(pair["left"])
+        packets.append(pair["right"])
+    packets.append([[2]])
+    packets.append([[6]])
+
+    for i in range(len(packets)):
+        for j in range(i+1,len(packets)):
+            if compare(packets[i],packets[j]) == -1:
+                packets[i], packets[j] = packets[j], packets[i]
+                
+    return (packets.index([[2]])+1) * (packets.index([[6]])+1)
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
