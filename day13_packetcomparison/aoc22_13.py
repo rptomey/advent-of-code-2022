@@ -6,10 +6,10 @@ def compare(left, right):
     if type(left) == int and type(right) == int:
         if left < right:
             return "ordered"
-        elif left == right:
-            return "continue"
-        else:
+        elif left > right:
             return "unordered"
+        else:
+            return "continue"
     
     # Make sure both sides are lists before we do anything else.
     if type(left) != list:
@@ -22,11 +22,15 @@ def compare(left, right):
         if i >= len(right):
             return "unordered"
         result = compare(left[i], right[i])
-        if result == "ordered" or result == "unordered":
+        if result != "continue":
             return result
 
-    # Fallback to ordered if we run out of stuff to test.
-    return "ordered"
+    if len(left) < len(right):
+        return "ordered"
+    elif len(left) > len(right):
+        return "unordered"
+    else:
+        return "continue"
 
 def parse(file_name):
     """Parse input"""
