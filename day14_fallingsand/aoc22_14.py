@@ -1,37 +1,6 @@
 import sys
 import copy
 
-def compare(left, right):
-    #print(f"- Compare {left} vs {right}")
-    if type(left) == int and type(right) == int:
-        if left < right:
-            return "ordered"
-        elif left > right:
-            return "unordered"
-        else:
-            return "continue"
-    
-    # Make sure both sides are lists before we do anything else.
-    if type(left) != list:
-        left = [left]
-    if type(right) != list:
-        right = [right]
-
-    # Check all of left against all of right.
-    for i in range(len(left)):
-        if i >= len(right):
-            return "unordered"
-        result = compare(left[i], right[i])
-        if result != "continue":
-            return result
-
-    if len(left) < len(right):
-        return "ordered"
-    elif len(left) > len(right):
-        return "unordered"
-    else:
-        return "continue"
-
 def parse(file_name):
     """Parse input"""
     raw_input = []
