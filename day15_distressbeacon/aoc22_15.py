@@ -220,40 +220,91 @@ def part2(data):
         elif 0 <= sensor["min_y"] <= area_boundary or 0 <= sensor["max_y"] <= area_boundary:
             relevant_sensors.append(sensor)
 
-    search_area = set()
-
-    for x in range(area_boundary+1):
-        for y in range(area_boundary+1):
-            coordinate = (x,y)
-            search_area.add(coordinate)
-
+    # Find the relevant border of each sensor
     for sensor in relevant_sensors:
+        print(f"Plotting border of sensor {sensor['sensor_loc']}")
+        sensor["border"] = []
         for y in range(sensor["min_y"], sensor["max_y"]+1):
             if 0 <= y <= area_boundary:
                 if y == sensor["min_y"]:
                     point = (sensor["s_x"],y)
-                    search_area.discard(point)
+                    if 0 <= point[0] <= area_boundary:
+                        sensor["border"].append(point)
                 elif y < sensor["s_y"]:
                     distance_from_bottom = y - sensor["min_y"]
                     center = sensor["s_x"]
-                    for x in range(center-distance_from_bottom, center+distance_from_bottom+1):
-                        point = (x,y)
-                        search_area.discard(point)
+                    left_point = (center-distance_from_bottom, y)
+                    right_point = (center+distance_from_bottom, y)
+                    if 0 <= left_point[0] <= area_boundary:
+                        sensor["border"].append(left_point)
+                    if 0 <= right_point[0] <= area_boundary:
+                        sensor["border"].append(right_point)
                 elif y == sensor["s_y"]:
-                    for x in range(sensor["min_x"],sensor["max_x"]+1):
-                        point = (x,y)
-                        search_area.discard(point)
+                    left_point = (sensor["min_x"], y)
+                    right_point = (sensor["max_x"], y)
+                    if 0 <= left_point[0] <= area_boundary:
+                        sensor["border"].append(left_point)
+                    if 0 <= right_point[0] <= area_boundary:
+                        sensor["border"].append(right_point)
                 elif y > sensor["s_y"]:
                     distance_from_top = sensor["max_y"] - y
                     center = sensor["s_x"]
-                    for x in range(center-distance_from_top, center+distance_from_top+1):
-                        point = (x, y)
-                        search_area.discard(point)
+                    left_point = (center-distance_from_top, y)
+                    right_point = (center+distance_from_top, y)
+                    if 0 <= left_point[0] <= area_boundary:
+                        sensor["border"].append(left_point)
+                    if 0 <= right_point[0] <= area_boundary:
+                        sensor["border"].append(right_point)
                 elif y == sensor["max_y"]:
                     point = (sensor["s_x"], y)
-                    search_area.discard(point)
+                    if 0 <= point[0] <= area_boundary:
+                        sensor["border"].append(point)
+    num_sensors = len(relevant_sensors)
+    checked_sensors = 0
+    possible_spaces_horizontal = set()
+    possible_spaces_vertical = set()
+    # For each combination of sensors, see if any two border points are exactly 2 apart, vertically or horizontally.
+    for sensor_a in relevant_sensors:
+        checked_sensors += 1
+        for sensor_b in relevant_sensors:
+            print(f"Checking sensor {sensor_a['sensor_loc']} against {sensor_b['sensor_loc']} - ({checked_sensors} of {num_sensors})")
+            a_manhattan = abs(sensor_a["b_x"] - sensor_a["s_x"]) + abs(sensor_a["b_y"] - sensor_a["s_y"])
+            b_manhattan = abs(sensor_b["b_x"] - sensor_b["s_x"]) + abs(sensor_b["b_y"] - sensor_b["s_y"])
+            ab_manhattan = abs(sensor_b["s_x"] - sensor_a["s_x"]) + abs(sensor_b["s_y"] - sensor_a["s_y"])
+            if a_manhattan + b_manhattan < ab_manhattan:
+                a_border = len(sensor_a["border"])
+                checked_borders = 0
+                for space_a in sensor_a["border"]:
+                    checked_borders += 1
+                    print(f"Checking border {checked_borders} of {a_border}")
+                    for space_b in sensor_b["border"]:
+                        if space_b[0] - space_a[0] == 2 and space_b[1] == space_a[1]:
+                            point = (space_b[0]-1, space_b[1])
+                            possible_spaces_horizontal.add(point)
+                        if space_b[1] - space_a[1] == 2 and space_b[0] == space_a[0]:
+                            point = (space_b[0], space_b[1]-1)
+                            possible_spaces_vertical.add(point)
     
-    print(search_area)
+    overlapping_spaces = set()
+    # Narrow down to only spaces from both
+    for space in possible_spaces_horizontal:
+        if space in possible_spaces_vertical:
+            overlapping_spaces.add(space)
+
+    # Compare the Manhattan distance of each remaining space to the Manhattan distance of each sensor to its beacon
+    # and eliminate those that are closer to a sensor than the beacon.
+    spaces_to_check = list(overlapping_spaces)
+    for space in spaces_to_check:
+        for sensor in relevant_sensors:
+            beacon_distance = abs(sensor["b_x"] - sensor["s_x"]) + abs(sensor["b_y"] - sensor["s_y"])
+            space_distance = abs(space[0] - sensor["s_x"]) + abs(space[1] - sensor["s_y"])
+            if space_distance < beacon_distance:
+                overlapping_spaces.discard(space)
+                break
+    
+    last_space =list(overlapping_spaces)[0]
+    return last_space[0] * 4000000 + last_space[1]
+    # This would work, but it'll take around 90 days to run on my computer.
 
 def solve(puzzle_input):
     """Solve the puzzle for the given input."""
